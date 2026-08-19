@@ -9,6 +9,18 @@
     "directory": ".output/public",
     "binding": "ASSETS"
   },
+  // D1(SQLite)。Workers 上ではこのバインディングが env.DB として見え、
+  // db.ts が FS ストアの代わりに使う。スキーマは migrations/ で管理し、
+  // `wrangler d1 migrations apply tanstack-start-todo --remote -c wrangler.jsonc`
+  // で適用する(-c は Nitro が生成するリダイレクト設定を避けるため)。
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "tanstack-start-todo",
+      "database_id": "0e290e6d-bf97-42cf-8752-0b0d2d38c640",
+      "migrations_dir": "migrations"
+    }
+  ],
   "observability": {
     "enabled": true
   }

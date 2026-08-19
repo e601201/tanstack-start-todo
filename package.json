@@ -8,7 +8,10 @@
     "check": "tsc --noEmit",
     "start": "node .output/server/index.mjs",
     "build:cf": "NITRO_PRESET=cloudflare_module vite build",
-    "deploy:cf": "npm run build:cf && wrangler deploy"
+    "dev:cf": "npm run build:cf && wrangler dev",
+    "deploy:cf": "npm run build:cf && wrangler deploy",
+    "d1:migrate": "wrangler d1 migrations apply tanstack-start-todo --local -c wrangler.jsonc",
+    "d1:migrate:remote": "wrangler d1 migrations apply tanstack-start-todo --remote -c wrangler.jsonc"
   },
   "keywords": [],
   "author": "",
