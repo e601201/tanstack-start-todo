@@ -40,7 +40,9 @@ try {
 
 function RootDocument({ children }: { children: ReactNode }) {
   return (
-    <html lang="ja">
+    // data-theme はハイドレーション前にインラインスクリプトが付与するため、
+    // この要素の属性差分警告のみ抑止する(子要素には影響しない)
+    <html lang="ja" suppressHydrationWarning>
       <head>
         <HeadContent />
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
