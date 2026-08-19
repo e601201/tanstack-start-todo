@@ -30,6 +30,7 @@ npm run deploy:cf  # Cloudflare Workers へデプロイ(要 wrangler login)
 | サーバー専用境界 | `src/server/db.ts` — `node:fs` 等への静的 import(クライアントに混入すればビルド失敗)+ `createServerOnlyFn`(実行時ガード)の二重防御。クライアントが import してよいのは `functions.ts`(RPC 境界)まで |
 | ルート別 SSR モード | `/todos` = フル SSR(既定)/ `/about` = `ssr: 'data-only'`(loader はサーバー、HTML はクライアント)/ `/settings` = `ssr: false`(完全クライアント、localStorage を直接使用) |
 | デプロイランタイム | `vite.config.ts` の Nitro プラグイン。既定は node-server(`.output/server/index.mjs`)。`NITRO_PRESET=cloudflare_module`(`wrangler.jsonc` 併用)で Cloudflare Workers にも同一コードでデプロイ済み。FS を持たないランタイムでは `db.ts` がインメモリへフォールバックする(isolate 再起動で消えるため、本格運用は KV / D1 への差し替えを推奨) |
+| Hono による REST API | `src/server/api.ts`(Hono アプリ本体)+ `src/routes/api.$.ts`(キャッチオールなサーバールートが `/api/*` を `app.fetch` へ委譲)。内部通信は `createServerFn` で足りるため学習用 —— 外部公開 API・横断ミドルウェア・OpenAPI が必要になった時の拡張ポイント |
 
 ## 構成
 
@@ -40,8 +41,10 @@ src/
   server/
     db.ts              サーバー専用データ層(.data/todos.json に永続化)
     functions.ts       createServerFn 群(RPC 境界、Zod 検証)
+    api.ts             Hono アプリ(/api/* の REST エンドポイント)
   routes/
     __root.tsx         フルドキュメント SSR シェル
+    api.$.ts           /api/* を Hono に委譲するキャッチオール
     index.tsx          ホーム
     todos.tsx          /todos レイアウト
     todos.index.tsx    一覧: search params + loader + ストリーミング統計 + 追加/トグル/削除

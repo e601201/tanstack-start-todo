@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as TodosRouteImport } from './routes/todos'
+import { Route as ApiSplatRouteImport } from './routes/api.$'
 import { Route as TodosIndexRouteImport } from './routes/todos.index'
 import { Route as TodosTodoIdRouteImport } from './routes/todos.$todoId'
 
@@ -36,6 +37,11 @@ const TodosRoute = TodosRouteImport.update({
   path: '/todos',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiSplatRoute = ApiSplatRouteImport.update({
+  id: '/api/$',
+  path: '/api/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TodosIndexRoute = TodosIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -52,6 +58,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/settings': typeof SettingsRoute
   '/todos': typeof TodosRouteWithChildren
+  '/api/$': typeof ApiSplatRoute
   '/todos/$todoId': typeof TodosTodoIdRoute
   '/todos/': typeof TodosIndexRoute
 }
@@ -59,6 +66,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/settings': typeof SettingsRoute
+  '/api/$': typeof ApiSplatRoute
   '/todos/$todoId': typeof TodosTodoIdRoute
   '/todos': typeof TodosIndexRoute
 }
@@ -68,21 +76,29 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/settings': typeof SettingsRoute
   '/todos': typeof TodosRouteWithChildren
+  '/api/$': typeof ApiSplatRoute
   '/todos/$todoId': typeof TodosTodoIdRoute
   '/todos/': typeof TodosIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/about' | '/settings' | '/todos' | '/todos/$todoId' | '/todos/'
+    | '/'
+    | '/about'
+    | '/settings'
+    | '/todos'
+    | '/api/$'
+    | '/todos/$todoId'
+    | '/todos/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/settings' | '/todos/$todoId' | '/todos'
+  to: '/' | '/about' | '/settings' | '/api/$' | '/todos/$todoId' | '/todos'
   id:
     | '__root__'
     | '/'
     | '/about'
     | '/settings'
     | '/todos'
+    | '/api/$'
     | '/todos/$todoId'
     | '/todos/'
   fileRoutesById: FileRoutesById
@@ -92,6 +108,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   SettingsRoute: typeof SettingsRoute
   TodosRoute: typeof TodosRouteWithChildren
+  ApiSplatRoute: typeof ApiSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -122,6 +139,13 @@ declare module '@tanstack/react-router' {
       path: '/todos'
       fullPath: '/todos'
       preLoaderRoute: typeof TodosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$': {
+      id: '/api/$'
+      path: '/api/$'
+      fullPath: '/api/$'
+      preLoaderRoute: typeof ApiSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/todos/': {
@@ -158,6 +182,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   SettingsRoute: SettingsRoute,
   TodosRoute: TodosRouteWithChildren,
+  ApiSplatRoute: ApiSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
