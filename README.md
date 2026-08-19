@@ -10,7 +10,12 @@ npm run dev     # 開発サーバー (http://localhost:3000)
 npm run build   # 本番ビルド (.output/)
 npm run start   # 本番サーバー (node .output/server/index.mjs)
 npm run check   # 型チェック
+
+npm run build:cf   # Cloudflare Workers 向けビルド
+npm run deploy:cf  # Cloudflare Workers へデプロイ(要 wrangler login)
 ```
+
+公開 URL: https://tanstack-start-todo.k-arthur1111.workers.dev
 
 ## 実装している機能と場所
 
@@ -24,7 +29,7 @@ npm run check   # 型チェック
 | ストリーミング | `todos.index.tsx` — loader が統計の Promise を await せず返し、`<Suspense>` + `<Await>` で受ける。シェル+一覧が先着し、統計チャンクが out-of-order で後着(bot UA には完全な HTML を返す) |
 | サーバー専用境界 | `src/server/db.ts` — `node:fs` 等への静的 import(クライアントに混入すればビルド失敗)+ `createServerOnlyFn`(実行時ガード)の二重防御。クライアントが import してよいのは `functions.ts`(RPC 境界)まで |
 | ルート別 SSR モード | `/todos` = フル SSR(既定)/ `/about` = `ssr: 'data-only'`(loader はサーバー、HTML はクライアント)/ `/settings` = `ssr: false`(完全クライアント、localStorage を直接使用) |
-| デプロイランタイム | `vite.config.ts` の Nitro プラグイン。既定は node-server(`.output/server/index.mjs`)。`NITRO_PRESET=vercel` 等でランタイムだけ差し替え可能 — アプリケーションコードは不変 |
+| デプロイランタイム | `vite.config.ts` の Nitro プラグイン。既定は node-server(`.output/server/index.mjs`)。`NITRO_PRESET=cloudflare_module`(`wrangler.jsonc` 併用)で Cloudflare Workers にも同一コードでデプロイ済み。FS を持たないランタイムでは `db.ts` がインメモリへフォールバックする(isolate 再起動で消えるため、本格運用は KV / D1 への差し替えを推奨) |
 
 ## 構成
 
