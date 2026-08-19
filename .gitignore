@@ -3,5 +3,6 @@ dist
 .output
 .nitro
 .tanstack
+.wrangler
 .data
 *.local

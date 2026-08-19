@@ -42,21 +42,35 @@ const seedTodos = (): Array<Todo> => [
   },
 ]
 
+// ファイルシステムを持たないランタイム(Cloudflare Workers 等)では
+// インメモリにフォールバックする。永続化はプロセス(isolate)の寿命まで。
+let memoryStore: Array<Todo> | null = null
+
 const readStore = createServerOnlyFn(async (): Promise<Array<Todo>> => {
   try {
     const raw = await readFile(DATA_FILE, 'utf8')
     return JSON.parse(raw) as Array<Todo>
   } catch {
+    if (memoryStore) return memoryStore
     const todos = seedTodos()
-    await mkdir(DATA_DIR, { recursive: true })
-    await writeFile(DATA_FILE, JSON.stringify(todos, null, 2))
+    try {
+      await mkdir(DATA_DIR, { recursive: true })
+      await writeFile(DATA_FILE, JSON.stringify(todos, null, 2))
+    } catch {
+      memoryStore = todos
+    }
     return todos
   }
 })
 
 const writeStore = createServerOnlyFn(async (todos: Array<Todo>) => {
-  await mkdir(DATA_DIR, { recursive: true })
-  await writeFile(DATA_FILE, JSON.stringify(todos, null, 2))
+  memoryStore = todos
+  try {
+    await mkdir(DATA_DIR, { recursive: true })
+    await writeFile(DATA_FILE, JSON.stringify(todos, null, 2))
+  } catch {
+    // FS 不可の環境ではメモリのみ
+  }
 })
 
 // 書き込みはプロセス内で直列化し、read-modify-write の競合を防ぐ

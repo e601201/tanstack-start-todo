@@ -1,0 +1,15 @@
+{
+  // Cloudflare Workers デプロイ設定。
+  // ビルドは NITRO_PRESET=cloudflare_module vite build(npm run build:cf)。
+  "name": "tanstack-start-todo",
+  "main": ".output/server/index.mjs",
+  "compatibility_date": "2026-08-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": ".output/public",
+    "binding": "ASSETS"
+  },
+  "observability": {
+    "enabled": true
+  }
+}
